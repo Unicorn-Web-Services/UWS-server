@@ -15,7 +15,14 @@ async def handle_connection(websocket):
 async def start_terminal_server():
     print("Starting terminal WebSocket server on port 8765...")
     try:
-        async with websockets.serve(handle_connection, "0.0.0.0", 8765):
+        # Allow all origins to prevent 403 errors
+        async with websockets.serve(
+            handle_connection, 
+            "0.0.0.0", 
+            8765,
+            origins=None  # Allow connections from any origin
+        ):
+            print("Terminal WebSocket server successfully started on port 8765")
             # Keep the server running until cancelled
             await asyncio.Future()
     except asyncio.CancelledError:
@@ -23,4 +30,6 @@ async def start_terminal_server():
         raise
     except Exception as e:
         print(f"Terminal WebSocket server error: {e}")
+        import traceback
+        traceback.print_exc()
         raise 

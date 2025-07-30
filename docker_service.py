@@ -1,7 +1,7 @@
 import docker
 from docker.errors import DockerException
 from models import ContainerConfig
-import random
+from autoNewservice import setup_fastapi_container
 from utils import get_local_ip
 
 try:
@@ -192,3 +192,10 @@ def _get_free_port():
         s.listen(1)
         port = s.getsockname()[1]
     return port
+
+def launch_template_container(template:str):
+    result = setup_fastapi_container(repo_url="https://github.com/Unicorn-Web-Services/UWS-tools", repo_folder="Buckets", container_name="bucket_cont", image_name="bucket_container", project_dir="../templates", show_logs=True, app_module="buckets:app")
+    if result['success']:
+        print(f"App running at {result['url']}")
+        print(f"Container: {result['container_name']}")
+        print(f"Port: {result['port']}")

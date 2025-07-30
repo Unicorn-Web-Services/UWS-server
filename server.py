@@ -3,7 +3,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from models import ContainerConfig
-from docker_service import launch_container, get_container_status, list_containers, start_container, stop_container, get_container_ports
+from docker_service import launch_container, get_container_status, list_containers, start_container, stop_container, get_container_ports, launch_template_container
 import httpx
 from utils import get_local_ip
 from dotenv import load_dotenv
@@ -41,8 +41,13 @@ async def validation_exception_handler(request, exc):
 
 @app.post("/launch")
 def launch(config: ContainerConfig, _: bool = Depends(verify_orchestrator_token)):
-    print(config)
+    print("Received config:", config)
     return launch_container(config)
+
+@app.post("/launchBucket")
+def launch_bucket( _: bool = Depends(verify_orchestrator_token)):
+    """Launch a new bucket service container"""
+    return launch_template_container("")
 
 @app.get("/containers/{container_id}/status")
 def get_status(container_id: str, _: bool = Depends(verify_orchestrator_token)):
@@ -93,5 +98,5 @@ async def shutdown_tasks():
             print("Terminal server shutdown complete.")
 
 @app.get("/health", status_code=200)
-def health_check():
+def health_check(_: bool = Depends(verify_orchestrator_token)):
     return {"status": "ok"}
