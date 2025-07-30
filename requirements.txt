@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+docker
+pydantic
+httpx
+dotenv
+socket
+websockets
+asyncio
