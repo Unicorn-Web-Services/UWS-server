@@ -21,10 +21,10 @@ async def handle_terminal(websocket, path):
         if container.status != 'running':
             error_msg = f"Cannot connect to terminal: Container '{container.name}' is {container.status}, not running"
             print(error_msg)
-            await websocket.send(f"ERROR: {error_msg}\n")
-            await websocket.send("Available options:\n")
-            await websocket.send("1. Start the container first using: docker start <container_id>\n")
-            await websocket.send("2. Launch a new container using the /launch endpoint\n")
+            await websocket.send_text(f"ERROR: {error_msg}\n")
+            await websocket.send_text("Available options:\n")
+            await websocket.send_text("1. Start the container first using: docker start <container_id>\n")
+            await websocket.send_text("2. Launch a new container using the /launch endpoint\n")
             await websocket.close()
             return
 
@@ -47,11 +47,11 @@ async def handle_terminal(websocket, path):
         print("Socket connection established successfully")
         
         # Send initial setup info to the WebSocket client
-        await websocket.send("=== Docker Terminal Session Started ===\n")
-        await websocket.send(f"Container: {container.name} ({container.id[:12]})\n")
-        await websocket.send(f"Status: {container.status}\n")
-        await websocket.send(f"Image: {container.image.tags[0] if container.image.tags else 'unknown'}\n")
-        await websocket.send("========================================\n")
+        await websocket.send_text("=== Docker Terminal Session Started ===\n")
+        await websocket.send_text(f"Container: {container.name} ({container.id[:12]})\n")
+        await websocket.send_text(f"Status: {container.status}\n")
+        await websocket.send_text(f"Image: {container.image.tags[0] if container.image.tags else 'unknown'}\n")
+        await websocket.send_text("========================================\n")
         
         # Send a command to show environment setup
         exec_socket._sock.send(b"echo 'Terminal ready - $(whoami)@$(hostname):$(pwd)'\n")
@@ -71,7 +71,7 @@ async def handle_terminal(websocket, path):
                         print("No more data from container - connection closed")
                         break
                     decoded_data = data.decode(errors="ignore")
-                    await websocket.send(decoded_data)
+                    await websocket.send_text(decoded_data)
                     print(f"Sent data to WebSocket: {repr(decoded_data)}")
                 except Exception as e:
                     print(f"Error in container_to_ws: {e}")
@@ -82,7 +82,7 @@ async def handle_terminal(websocket, path):
             print("WebSocket-to-Container task started")
             while True:
                 try:
-                    data = await websocket.recv()
+                    data = await websocket.receive_text()
                     print(f"Received data from WebSocket: {repr(data)}")
                     # Send data to the container
                     await loop.run_in_executor(None, exec_socket._sock.send, data.encode())

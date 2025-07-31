@@ -6,3 +6,16 @@ httpx
 dotenv
 websockets
 asyncio
+# Enhanced logging and monitoring
+structlog
+prometheus-client
+# Security enhancements
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+# Rate limiting
+slowapi
+# Health checks
+healthcheck
+# CORS support
+fastapi-cors
